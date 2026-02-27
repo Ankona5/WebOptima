@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebOptima — Web Optimization Framework</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f5f5f5;
+    color: #222;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+  /* HEADER */
+  header {
+    background: #fff;
+    border-bottom: 2px solid #ddd;
+    padding: 16px 0;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .logo-text { font-size: 22px; font-weight: bold; color: #333; }
+  .logo-text span { color: #1a73e8; }
+
+  .header-meta { font-size: 12px; color: #666; text-align: right; line-height: 1.6; }
+
+  /* HERO */
+  .hero {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 30px 0 24px;
+    text-align: center;
+  }
+
+  .hero h1 { font-size: 26px; font-weight: bold; margin-bottom: 10px; color: #111; }
+  .hero h1 span { color: #1a73e8; }
+  .hero p { color: #555; font-size: 14px; max-width: 520px; margin: 0 auto 20px; line-height: 1.6; }
+
+  .pillars-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .pillar-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  /* INPUT SECTION */
+  .input-section {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 20px;
+    margin: 24px 0;
+  }
+
+  .input-section label {
+    display: block;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  input[type="text"], input[type="password"] {
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    background: #fafafa;
+    color: #222;
+  }
+
+  input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #1a73e8;
+  }
+
+  #urlInput { flex: 1; min-width: 200px; }
+  #apiKey { width: 220px; }
+
+  .btn-primary {
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover { background: #1558b0; }
+  .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
+
+  .btn-secondary {
+    background: #fff;
+    color: #555;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover { background: #f0f0f0; }
+
+  .api-hint { margin-top: 8px; font-size: 12px; color: #888; }
+  .api-hint a { color: #1a73e8; }
+
+  /* ERROR */
+  .error-msg {
+    display: none;
+    background: #fff3f3;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 12px 16px;
+    color: #c62828;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .error-msg.active { display: block; }
+
+  /* LOADING */
+  .loading-state { display: none; text-align: center; padding: 40px 20px; }
+  .loading-state.active { display: block; }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #ddd;
+    border-top-color: #1a73e8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-step { font-size: 13px; color: #888; padding: 3px 0; }
+  .loading-step.active { color: #1a73e8; }
+  .loading-step.done { color: #2e7d32; }
+
+  /* RESULTS */
+  .results { display: none; }
+  .results.active { display: block; }
+
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .analyzed-url {
+    font-size: 13px;
+    background: #e8f0fe;
+    border: 1px solid #c5d8fb;
+    color: #1a73e8;
+    padding: 5px 12px;
+    border-radius: 4px;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ddd;
+  }
+
+  /* SCORES GRID */
+  .scores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .score-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .score-icon { font-size: 24px; margin-bottom: 6px; }
+  .score-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+  .score-ring { width: 80px; height: 80px; margin: 0 auto 10px; position: relative; }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring circle { fill: none; stroke-width: 6; stroke-linecap: round; }
+  .score-ring .bg { stroke: #eee; }
+  .score-arc { transition: stroke-dashoffset 1s ease; }
+
+  .score-value {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: bold;
+  }
+
+  .score-grade {
+    font-size: 12px; font-weight: bold;
+    padding: 2px 10px; border-radius: 4px; display: inline-block;
+  }
+  .grade-good { background: #e8f5e9; color: #2e7d32; }
+  .grade-avg  { background: #fff8e1; color: #f57f17; }
+  .grade-poor { background: #ffebee; color: #c62828; }
+
+  /* METRICS */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .metric-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .metric-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .metric-name { font-size: 13px; font-weight: bold; }
+  .metric-abbr {
+    font-size: 10px; background: #f0f0f0;
+    padding: 2px 6px; border-radius: 3px; color: #666;
+    margin-left: 6px;
+  }
+
+  .metric-value-box { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
+
+  .metric-bar-bg { background: #eee; border-radius: 3px; height: 5px; overflow: hidden; margin-bottom: 8px; }
+  .metric-bar { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+  .metric-desc { font-size: 11px; color: #777; line-height: 1.5; }
+
+  /* RECOMMENDATIONS */
+  .recs-list { margin-bottom: 28px; }
+
+  .rec-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-left: 4px solid;
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .rec-item.high   { border-left-color: #c62828; }
+  .rec-item.medium { border-left-color: #f57f17; }
+  .rec-item.low    { border-left-color: #2e7d32; }
+
+  .rec-icon { font-size: 20px; flex-shrink: 0; }
+  .rec-content { flex: 1; }
+  .rec-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+  .rec-desc { font-size: 13px; color: #555; line-height: 1.5; }
+  .rec-pillar { font-size: 11px; color: #888; margin-top: 4px; }
+
+  .rec-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 3px;
+    flex-shrink: 0; font-weight: bold; align-self: flex-start;
+  }
+  .tag-high   { background: #ffebee; color: #c62828; }
+  .tag-medium { background: #fff8e1; color: #f57f17; }
+  .tag-low    { background: #e8f5e9; color: #2e7d32; }
+
+  /* FRAMEWORK CARDS */
+  .framework-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .framework-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .framework-card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .framework-icon { font-size: 20px; }
+  .framework-title { font-size: 14px; font-weight: bold; }
+  .framework-subtitle { font-size: 11px; color: #888; }
+
+  .checklist { list-style: none; }
+  .checklist li {
+    font-size: 12px; color: #555;
+    padding: 4px 0; display: flex; align-items: flex-start; gap: 6px;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .checklist li:last-child { border: none; }
+
+  /* FOOTER */
+  footer {
+    background: #fff;
+    border-top: 2px solid #ddd;
+    padding: 20px 0;
+    margin-top: 30px;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.8;
+  }
+
+  footer strong { color: #1a73e8; }
+
+  @media (max-width: 600px) {
+    .input-row { flex-direction: column; }
+    #apiKey { width: 100%; }
+    .scores-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div>
+        <div class="logo-text">Web<span>Optima</span></div>
+        <div style="font-size:12px; color:#888;">Comprehensive Web Optimization Framework</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <!-- HERO -->
+    <div class="hero" style="background:#f5f5f5; border:none; text-align:left; padding:24px 0 10px;">
+      <h1>Analyze Any Website Across <span>4 Optimization Pillars</span></h1>
+      <p>Our unified framework evaluates Performance, SEO, Green Energy Efficiency, and Mobile experience in one automated audit.</p>
+      <div class="pillars-row" style="justify-content:flex-start; margin-top:12px;">
+        <div class="pillar-chip"><span class="dot" style="background:#1a73e8"></span> Performance</div>
+        <div class="pillar-chip"><span class="dot" style="background:#7c4dff"></span> SEO</div>
+        <div class="pillar-chip"><span class="dot" style="background:#2e7d32"></span> Green Web</div>
+        <div class="pillar-chip"><span class="dot" style="background:#e65100"></span> Mobile</div>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-section">
+      <label>Enter a website URL to audit:</label>
+      <div class="input-row">
+        <input type="text" id="urlInput" placeholder="https://example.com" value="https://web.dev">
+        <input type="password" id="apiKey" placeholder="Google API Key (optional)">
+        <button class="btn-primary" id="analyzeBtn" onclick="startAnalysis()">Analyze</button>
+        <button class="btn-secondary" onclick="loadDemo()">Demo Mode</button>
+      </div>
+      <div class="api-hint">
+        Optional: Get a free API key from <a href="https://console.developers.google.com" target="_blank">Google Cloud Console</a> → Enable PageSpeed Insights API. Without a key, use Demo Mode.
+      </div>
+    </div>
+
+    <!-- ERROR -->
+    <div class="error-msg" id="errorMsg"></div>
+
+    <!-- LOADING -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <div style="font-size:14px; color:#555; margin-bottom:12px;">Running audit...</div>
+      <div id="step1" class="loading-step">Connecting to PageSpeed Insights API...</div>
+      <div id="step2" class="loading-step">Analyzing Performance metrics...</div>
+      <div id="step3" class="loading-step">Scanning SEO signals...</div>
+      <div id="step4" class="loading-step">Estimating Green / Energy efficiency...</div>
+      <div id="step5" class="loading-step">Evaluating Mobile responsiveness...</div>
+      <div id="step6" class="loading-step">Generating recommendations...</div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results" id="results">
+
+      <div class="results-header">
+        <div>
+          <div style="font-size:12px; color:#888; margin-bottom:4px;">Audited URL:</div>
+          <div class="analyzed-url" id="analyzedUrl"></div>
+        </div>
+        <button class="btn-secondary" onclick="resetUI()">← New Analysis</button>
+      </div>
+
+      <div class="section-title">Overall Pillar Scores</div>
+      <div class="scores-grid" id="scoresGrid"></div>
+
+      <div class="section-title">Core Web Vitals &amp; Metrics</div>
+      <div class="metrics-grid" id="metricsGrid"></div>
+
+    </div><!-- /results -->
+
+    <!-- FRAMEWORK (always visible before results) -->
+    <div id="introFramework" style="margin-bottom:36px;">
+      <div class="section-title">Our 4-Pillar Framework</div>
+      <div class="framework-grid">
+        <div class="framework-card">
+          <div class="framework-card-header">
+            <div class="framework-icon">🔍</div>
+            <div><div class="framework-title">SEO Pillar</div><div class="framework-subtitle">Search visibility</div></div>
+          </div>
+          <ul class="checklist">
+            <li>📌 Core Web Vitals (LCP, INP, CLS)</li>
+            <li>📌 Meta tags &amp; structured data</li>
+            <li>📌 Page speed signals for ranking</li>
+          </ul>
+        </div>
+        <div class="framework-card">
+          <div class="framework-card-header">
+            <div class="framework-icon">🌱</div>
+            <div><div class="framework-title">Green Web Pillar</div><div class="framework-subtitle">Energy efficiency</div></div>
+          </div>
+          <ul class="checklist">
+            <li>📌 Dark mode / OLED energy savings</li>
+            <li>📌 WebP image formats (up to 54% saving)</li>
+            <li>📌 Reduce JS/CSS payload</li>
+          </ul>
+        </div>
+        <div class="framework-card">
+          <div class="framework-card-header">
+            <div class="framework-icon">📱</div>
+            <div><div class="framework-title">Mobile Pillar</div><div class="framework-subtitle">Mobile-first design</div></div>
+          </div>
+          <ul class="checklist">
+            <li>📌 Responsive layout</li>
+            <li>📌 Touch targets &amp; fast launch</li>
+            <li>📌 Low memory consumption</li>
+          </ul>
+        </div>
+        <div class="framework-card">
+          <div class="framework-card-header">
+            <div class="framework-icon">📊</div>
+            <div><div class="framework-title">Content Pillar</div><div class="framework-subtitle">User engagement</div></div>
+          </div>
+          <ul class="checklist">
+            <li>📌 CTR + Engageability balance</li>
+            <li>📌 Dynamic content recommendations</li>
+            <li>📌 Bounce rate reduction strategies</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <strong>WebOptima</strong> — A Comprehensive Framework for Modern Web Optimisation<br>
+    Ayush Soun (202400374) &amp; Ankona Mukherjee (202400560) · Dept. of AI&amp;DS, SMIT, SMU<br>
+    Under supervision of Mr. Sital Sharma
+  </div>
+</footer>
+
+<script>
+// ========== DEMO DATA ==========
+const demoData = {
+  url: "https://web.dev (Demo)",
+  scores: { performance: 72, seo: 85, green: 61, mobile: 79 },
+  metrics: [
+    { name:"Largest Contentful Paint", abbr:"LCP", value:"2.8s", numericValue:2800, threshold:4000, status:"avg", desc:"Time until the largest visible element loads. Target: < 2.5s.", color:"#f57f17", pillar:"perf" },
+    { name:"First Contentful Paint",   abbr:"FCP", value:"1.2s", numericValue:1200, threshold:3000, status:"good", desc:"Time until first content appears on screen. Target: < 1.8s.", color:"#2e7d32", pillar:"perf" },
+    { name:"Total Blocking Time",      abbr:"TBT", value:"380ms", numericValue:380, threshold:600,  status:"avg", desc:"Total time the main thread was blocked. Target: < 200ms.", color:"#f57f17", pillar:"perf" },
+    { name:"Cumulative Layout Shift",  abbr:"CLS", value:"0.12", numericValue:12,  threshold:25,   status:"avg", desc:"Measures visual stability. Target: < 0.1.", color:"#f57f17", pillar:"seo" },
+    { name:"Speed Index",              abbr:"SI",  value:"3.1s", numericValue:3100, threshold:5800, status:"good", desc:"How quickly content is visually populated.", color:"#2e7d32", pillar:"perf" },
+    { name:"Time to Interactive",      abbr:"TTI", value:"4.6s", numericValue:4600, threshold:7300, status:"avg", desc:"Time until page is fully interactive. Target: < 3.8s.", color:"#f57f17", pillar:"mobile" }
+  ],
+  recommendations: [
+    { priority:"high",   icon:"🖼️", title:"Serve images in WebP / AVIF format", desc:"Converting JPEGs to WebP can reduce image size by 25–34%, improving load time and Green Web score. Stoyanova (2025) found up to 54% energy reduction.", pillar:"Green + Performance" },
+    { priority:"high",   icon:"📦", title:"Eliminate render-blocking resources", desc:"3 JavaScript files and 1 CSS file are blocking page render. Defer non-critical JS and inline critical CSS to improve LCP and FCP.", pillar:"Performance + SEO" },
+    { priority:"medium", icon:"📱", title:"Improve mobile tap target sizes", desc:"14 interactive elements have tap targets smaller than 48×48px. This fails mobile usability guidelines and increases bounce rate on smartphones.", pillar:"Mobile" },
+    { priority:"medium", icon:"🌙", title:"Implement Dark Mode support", desc:"Adding prefers-color-scheme: dark can save 38–54% display energy on OLED screens (Stoyanova, 2025), improving the Green Web score.", pillar:"Green Web" },
+    { priority:"medium", icon:"🔍", title:"Add structured data / schema markup", desc:"Pages lack JSON-LD structured data. Adding Schema.org markup can improve click-through rates by 20–30%.", pillar:"SEO" },
+    { priority:"low",    icon:"⚡", title:"Enable text compression (Brotli/Gzip)", desc:"Server responses are not compressed. Brotli compression can reduce transfer sizes by 15–20%.", pillar:"Performance + Mobile" }
+  ]
+};
+
+// ========== HELPERS ==========
+function getGrade(score) {
+  if (score >= 90) return { label:'Excellent', cls:'grade-good' };
+  if (score >= 70) return { label:'Needs Work', cls:'grade-avg' };
+  return { label:'Poor', cls:'grade-poor' };
+}
+
+function getColor(score) {
+  if (score >= 90) return '#2e7d32';
+  if (score >= 70) return '#f57f17';
+  return '#c62828';
+}
+
+// ========== RENDER ==========
+function renderResults(data) {
+  document.getElementById('analyzedUrl').textContent = data.url;
+
+  // Scores
+  const scoreDefs = [
+    { key:'performance', label:'PERFORMANCE', icon:'⚡' },
+    { key:'seo',         label:'SEO',         icon:'🔍' },
+    { key:'green',       label:'GREEN WEB',   icon:'🌱' },
+    { key:'mobile',      label:'MOBILE',      icon:'📱' }
+  ];
+
+  document.getElementById('scoresGrid').innerHTML = scoreDefs.map(s => {
+    const score = data.scores[s.key];
+    const grade = getGrade(score);
+    const color = getColor(score);
+    const circ  = 2 * Math.PI * 34;
+    const offset = circ * (1 - score / 100);
+    return `
+      <div class="score-card">
+        <div class="score-icon">${s.icon}</div>
+        <div class="score-label">${s.label}</div>
+        <div class="score-ring">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="bg" cx="40" cy="40" r="34" stroke-dasharray="${circ}" stroke-dashoffset="0"/>
+            <circle class="score-arc" cx="40" cy="40" r="34"
+              stroke="${color}"
+              stroke-dasharray="${circ}"
+              stroke-dashoffset="${circ}"
+              data-target="${offset}"/>
+          </svg>
+          <div class="score-value" style="color:${color}">${score}</div>
+        </div>
+        <div class="score-grade ${grade.cls}">${grade.label}</div>
+      </div>`;
+  }).join('');
+
+  setTimeout(() => {
+    document.querySelectorAll('.score-arc').forEach(a => {
+      a.style.strokeDashoffset = a.dataset.target;
+    });
+  }, 100);
+
+  // Metrics
+  document.getElementById('metricsGrid').innerHTML = data.metrics.map(m => {
+    const pct = Math.min(100, Math.round((1 - m.numericValue / m.threshold) * 100 + 30));
+    const grade = m.status === 'good' ? 'grade-good' : m.status === 'avg' ? 'grade-avg' : 'grade-poor';
+    const label = m.status === 'good' ? 'Good' : m.status === 'avg' ? 'Needs Work' : 'Poor';
+    return `
+      <div class="metric-card">
+        <div class="metric-header">
+          <div class="metric-name">${m.name} <span class="metric-abbr">${m.abbr}</span></div>
+          <span class="score-grade ${grade}">${label}</span>
+        </div>
+        <div class="metric-value-box" style="color:${m.color}">${m.value}</div>
+        <div class="metric-bar-bg">
+          <div class="metric-bar" style="width:0%; background:${m.color}" data-target="${pct}%"></div>
+        </div>
+        <div class="metric-desc">${m.desc}</div>
+      </div>`;
+  }).join('');
+
+  setTimeout(() => {
+    document.querySelectorAll('.metric-bar').forEach(b => b.style.width = b.dataset.target);
+  }, 200);
+
+  document.getElementById('introFramework').style.display = 'none';
+  document.getElementById('results').classList.add('active');
+}
+
+// ========== API ==========
+async function fetchPageSpeed(url, apiKey) {
+  const params = new URLSearchParams({ url, strategy:'mobile' });
+  if (apiKey) params.append('key', apiKey);
+  const res = await fetch(`https://www.googleapis.com/pagespeedonline/v5/runPagespeed?${params}`);
+  if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+function parsePageSpeedData(data, url) {
+  const cats   = data.lighthouseResult.categories;
+  const audits = data.lighthouseResult.audits;
+  const score  = k => Math.round((cats[k]?.score || 0) * 100);
+  const green  = Math.round((score('performance') * 0.5) +
+    ((1 - Math.min(1, audits['uses-optimized-images']?.score || 1)) * 25) +
+    ((1 - Math.min(1, audits['unused-javascript']?.score     || 1)) * 25));
+
+  const st = s => s >= 0.9 ? 'good' : s >= 0.5 ? 'avg' : 'poor';
+  const cl = s => s >= 0.9 ? '#2e7d32' : s >= 0.5 ? '#f57f17' : '#c62828';
+
+  const lcp = audits['largest-contentful-paint'];
+  const fcp = audits['first-contentful-paint'];
+  const tbt = audits['total-blocking-time'];
+  const cls = audits['cumulative-layout-shift'];
+  const si  = audits['speed-index'];
+  const tti = audits['interactive'];
+
+  const recs = [];
+  const addRec = (key, p, icon, title, desc, pillar) => {
+    const a = audits[key];
+    if (a && a.score !== null && a.score < 0.9)
+      recs.push({ priority:p, icon, title, desc, pillar });
+  };
+  addRec('uses-webp-images','high','🖼️','Serve images in WebP/AVIF format','Converting to modern formats reduces image payload and energy use (Stoyanova 2025 — up to 54% saving).','Green + Performance');
+  addRec('render-blocking-resources','high','📦','Eliminate render-blocking resources','JS or CSS files are delaying first paint. Defer non-critical scripts.','Performance + SEO');
+  addRec('uses-responsive-images','medium','📱','Properly size images for mobile','Oversized images downloaded on mobile. Use srcset.','Mobile + Green');
+  addRec('unused-javascript','medium','🗑️','Remove unused JavaScript','Unused JS increases parse time and energy. Code-split bundles.','Performance + Green');
+  addRec('meta-description','medium','🔍','Add meta description for SEO','Pages without meta descriptions hurt click-through rate in search results.','SEO');
+  addRec('uses-text-compression','low','⚡','Enable Brotli/Gzip compression','Reduces transfer sizes by 15–20%.','Performance + Mobile');
+  if (!recs.length) recs.push({ priority:'low', icon:'🎉', title:'Great job! Consider Dark Mode for Green Web', desc:'Adding prefers-color-scheme: dark saves 38–54% display energy on OLED screens (Stoyanova 2025).', pillar:'Green Web' });
+
+  return {
+    url,
+    scores: { performance:score('performance'), seo:score('seo'), green:Math.max(10,Math.min(100,green)), mobile:Math.round(((score('performance')+score('best-practices'))/2)*0.9) },
+    metrics:[
+      { name:'Largest Contentful Paint',  abbr:'LCP', value:lcp?.displayValue||'N/A', numericValue:lcp?.numericValue||0, threshold:4000, status:st(lcp?.score), color:cl(lcp?.score), desc:'Target: < 2.5s.', pillar:'perf' },
+      { name:'First Contentful Paint',    abbr:'FCP', value:fcp?.displayValue||'N/A', numericValue:fcp?.numericValue||0, threshold:3000, status:st(fcp?.score), color:cl(fcp?.score), desc:'Target: < 1.8s.', pillar:'perf' },
+      { name:'Total Blocking Time',       abbr:'TBT', value:tbt?.displayValue||'N/A', numericValue:tbt?.numericValue||0, threshold:600,  status:st(tbt?.score), color:cl(tbt?.score), desc:'Target: < 200ms.', pillar:'perf' },
+      { name:'Cumulative Layout Shift',   abbr:'CLS', value:cls?.displayValue||'N/A', numericValue:(cls?.numericValue||0)*100, threshold:25, status:st(cls?.score), color:cl(cls?.score), desc:'Target: < 0.1.', pillar:'seo' },
+      { name:'Speed Index',               abbr:'SI',  value:si?.displayValue||'N/A',  numericValue:si?.numericValue||0,  threshold:5800, status:st(si?.score),  color:cl(si?.score),  desc:'How quickly content is visually populated.', pillar:'perf' },
+      { name:'Time to Interactive',       abbr:'TTI', value:tti?.displayValue||'N/A', numericValue:tti?.numericValue||0, threshold:7300, status:st(tti?.score), color:cl(tti?.score), desc:'Target: < 3.8s.', pillar:'mobile' }
+    ],
+    recommendations: recs
+  };
+}
+
+// ========== STEPS ==========
+async function animateSteps() {
+  const ids = ['step1','step2','step3','step4','step5','step6'];
+  const labels = ['Connecting to PageSpeed Insights API...','Analyzing Performance metrics...','Scanning SEO signals...','Estimating Green / Energy efficiency...','Evaluating Mobile responsiveness...','Generating recommendations...'];
+  for (let i = 0; i < ids.length; i++) {
+    await new Promise(r => setTimeout(r, 400));
+    document.getElementById(ids[i]).textContent = '🔄 ' + labels[i];
+    document.getElementById(ids[i]).className = 'loading-step active';
+    await new Promise(r => setTimeout(r, 500));
+    document.getElementById(ids[i]).textContent = '✅ ' + labels[i];
+    document.getElementById(ids[i]).className = 'loading-step done';
+  }
+}
+
+// ========== FLOW ==========
+async function startAnalysis() {
+  let url = document.getElementById('urlInput').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!url) { showError('Please enter a URL.'); return; }
+  if (!url.startsWith('http')) url = 'https://' + url;
+  hideError(); showLoading();
+  try {
+    const [raw] = await Promise.all([fetchPageSpeed(url, apiKey), animateSteps()]);
+    hideLoading();
+    renderResults(parsePageSpeedData(raw, url));
+  } catch(err) {
+    await new Promise(r => setTimeout(r, 1000));
+    hideLoading();
+    showError('API Error: ' + err.message + '. Try Demo Mode to see a sample result.');
+  }
+}
+
+function loadDemo() {
+  hideError(); showLoading();
+  animateSteps().then(() => { hideLoading(); renderResults(demoData); });
+}
+
+function resetUI() {
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('introFramework').style.display = 'block';
+  ['step1','step2','step3','step4','step5','step6'].forEach((id, i) => {
+    const labels = ['Connecting to PageSpeed Insights API...','Analyzing Performance metrics...','Scanning SEO signals...','Estimating Green / Energy efficiency...','Evaluating Mobile responsiveness...','Generating recommendations...'];
+    document.getElementById(id).textContent = labels[i];
+    document.getElementById(id).className = 'loading-step';
+  });
+}
+
+function showLoading() { document.getElementById('loadingState').classList.add('active'); document.getElementById('analyzeBtn').disabled = true; }
+function hideLoading() { document.getElementById('loadingState').classList.remove('active'); document.getElementById('analyzeBtn').disabled = false; }
+function showError(msg) { const e = document.getElementById('errorMsg'); e.textContent = msg; e.classList.add('active'); }
+function hideError() { document.getElementById('errorMsg').classList.remove('active'); }
+
+document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') startAnalysis(); });
+</script>
+
+</body>
+</html>
